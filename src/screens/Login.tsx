@@ -12,18 +12,17 @@ import React, {useState} from 'react';
 import {styles} from '../styles/styles';
 import {users} from '../data/users';
 import {User} from '../models/User';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 interface Props {
-  isLogin: (user: User) => void;
+  onLogin: (username: string) => void;
 }
-
 const Login = (props: Props) => {
+  const {onLogin} = props;
+
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
-  const {isLogin} = props;
-
-  const handlelogin = () => {
+  const handlelogin = async () => {
     const user = users.find(
       element => element.username === username && element.password === password,
     );
@@ -31,7 +30,10 @@ const Login = (props: Props) => {
     if (!user) {
       Alert.alert('Error', 'Invalid username/password, please try againt!');
     } else {
-      isLogin(user);
+      // save username to local storage
+      onLogin(user.username);
+
+      await AsyncStorage.setItem('user', JSON.stringify(user));
     }
   };
 
